@@ -11,7 +11,9 @@ import { DocumentsService } from '../documents/documents.service';
 import { SignersService } from '../signers/signers.service';
 import { DocumentStatus } from '../../shared/enums/document-status.enum';
 import { SignerStatus } from '../../shared/enums/signer-status.enum';
+import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
 
+@ApiTags('zapsign')
 @Controller('webhooks/zapsign')
 export class ZapSignWebhookController {
   constructor(
@@ -20,6 +22,12 @@ export class ZapSignWebhookController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Webhook para eventos do ZapSign' })
+  @ApiResponse({ status: 200, description: 'Evento processado com sucesso' })
+  @ApiHeader({
+    name: 'x-zapsign-signature',
+    description: 'Assinatura de verificação do ZapSign',
+  })
   @HttpCode(HttpStatus.OK)
   async handleWebhook(
     @Headers('x-zapsign-signature') signature: string,
