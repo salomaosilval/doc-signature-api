@@ -33,10 +33,9 @@ export class DocumentsService {
       },
     });
 
-    // Integração com ZapSign
     const zapSignDoc = await this.zapSignService.createDocument({
       name: document.name,
-      base64_pdf: document.fileUrl, // Aqui precisaria converter a URL para base64
+      base64_pdf: document.fileUrl,
       signers: document.signers.map((signer) => ({
         name: signer.name,
         email: signer.email,
@@ -44,7 +43,6 @@ export class DocumentsService {
       })),
     });
 
-    // Atualiza o documento com o ID do ZapSign
     return this.prisma.document.update({
       where: { id: document.id },
       data: {

@@ -5,7 +5,13 @@ import {
   HttpCode,
   HttpStatus,
   Headers,
+  UnauthorizedException,
+  RawBodyRequest,
+  Req,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
+import { validateZapSignWebhookSignature } from '../../shared/utils/webhook-signature.util';
 import { ZapSignWebhookDto } from './dto/zapsign-webhook.dto';
 import { DocumentsService } from '../documents/documents.service';
 import { SignersService } from '../signers/signers.service';
@@ -19,6 +25,7 @@ export class ZapSignWebhookController {
   constructor(
     private readonly documentsService: DocumentsService,
     private readonly signersService: SignersService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post()
@@ -31,9 +38,29 @@ export class ZapSignWebhookController {
   @HttpCode(HttpStatus.OK)
   async handleWebhook(
     @Headers('x-zapsign-signature') signature: string,
+    @Req() request: RawBodyRequest<Request>,
     @Body() webhookData: ZapSignWebhookDto,
   ) {
-    // TODO: Implementar validação da assinatura do webhook
+    const webhookSecret = this.configService.get<string>(
+      'ZAPSIGN_WEBHOOK_SECRET',
+    );
+    const rawBody = request.rawBody?.toString() || JSON.stringify(webhookData);
+
+    if (!signature || !webhookSecret) {
+      throw new UnauthorizedException(
+        'Assinatura do webhook ausente ou inválida',
+      );
+    }
+
+    const isValid = validateZapSignWebhookSignature(
+      rawBody,
+      signature,
+      webhookSecret,
+    );
+
+    if (!isValid) {
+      throw new UnauthorizedException('Assinatura do webhook inválida');
+    }
 
     if (webhookData.event_type === 'SIGN' && webhookData.signer_key) {
       await this.signersService.update(webhookData.signer_key, {
