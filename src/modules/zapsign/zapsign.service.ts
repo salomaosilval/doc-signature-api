@@ -8,7 +8,7 @@ export class ZapSignService {
   private readonly apiToken: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.apiToken = this.configService.get<string>('ZAPSIGN_API_TOKEN');
+    this.apiToken = this.configService.get<string>('ZAPSIGN_API_KEY');
   }
 
   async createDocument(createZapSignDocDto: CreateZapSignDocDto) {
@@ -17,22 +17,25 @@ export class ZapSignService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: this.apiToken,
+          Authorization: `Bearer ${this.apiToken}`,
         },
         body: JSON.stringify(createZapSignDocDto),
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error('ZapSign error:', errorData);
         throw new HttpException(
-          'Failed to create document in ZapSign',
+          `Failed to create document in ZapSign: ${JSON.stringify(errorData)}`,
           HttpStatus.BAD_REQUEST,
         );
       }
 
       return response.json();
     } catch (error) {
+      console.error('Full error:', error);
       throw new HttpException(
-        'ZapSign service error',
+        `ZapSign service error: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -55,8 +58,9 @@ export class ZapSignService {
 
       return response.json();
     } catch (error) {
+      console.error('Full error:', error);
       throw new HttpException(
-        'ZapSign service error',
+        `ZapSign service error: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
