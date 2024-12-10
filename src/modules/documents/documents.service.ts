@@ -33,9 +33,13 @@ export class DocumentsService {
       },
     });
 
+    const pdfResponse = await fetch(document.fileUrl);
+    const pdfBuffer = await pdfResponse.arrayBuffer();
+    const base64Pdf = Buffer.from(pdfBuffer).toString('base64');
+
     const zapSignDoc = await this.zapSignService.createDocument({
       name: document.name,
-      base64_pdf: document.fileUrl,
+      base64_pdf: base64Pdf,
       signers: document.signers.map((signer) => ({
         name: signer.name,
         email: signer.email,
