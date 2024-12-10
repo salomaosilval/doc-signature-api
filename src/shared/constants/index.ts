@@ -1,1 +1,1 @@
-export const ZAPSIGN_API_URL = 'https://api.zapsign.com.br/api/v1';
+export const ZAPSIGN_API_URL = 'https://sandbox.api.zapsign.com.br/api/v1';
