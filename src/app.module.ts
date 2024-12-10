@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
+import { DocumentsModule } from './modules/documents/documents.module';
+import { SignersModule } from './modules/signers/signers.module';
+import { ZapSignModule } from './modules/zapsign/zapsign.module';
 
 @Module({
   imports: [
@@ -8,8 +11,9 @@ import { PrismaModule } from './prisma/prisma.module';
       isGlobal: true,
     }),
     PrismaModule,
+    DocumentsModule,
+    SignersModule,
+    ZapSignModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
