@@ -62,17 +62,25 @@ export class ZapSignWebhookController {
       throw new UnauthorizedException('Assinatura do webhook inválida');
     }
 
-    if (webhookData.event_type === 'SIGN' && webhookData.signer_key) {
-      await this.signersService.update(webhookData.signer_key, {
-        status: SignerStatus.SIGNED,
-        signedAt: new Date(webhookData.signature_date),
-      });
+    for (const signer of webhookData.signers) {
+      if (signer.status === 'signed') {
+        await this.signersService.update(signer.token, {
+          status: SignerStatus.SIGNED,
+          signedAt: new Date(signer.signed_at),
+        });
+      }
     }
 
-    if (webhookData.event_type === 'FINISH') {
-      await this.documentsService.update(webhookData.doc_key, {
-        status: DocumentStatus.COMPLETED,
-      });
+    if (webhookData.status === 'signed') {
+      const document = await this.documentsService.findByZapSignId(
+        webhookData.token,
+      );
+      if (document) {
+        await this.documentsService.update(document.id, {
+          status: DocumentStatus.COMPLETED,
+          signedFileUrl: webhookData.signed_file,
+        });
+      }
     }
 
     return { success: true };

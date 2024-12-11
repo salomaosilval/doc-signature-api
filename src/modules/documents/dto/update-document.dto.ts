@@ -21,4 +21,8 @@ export class UpdateDocumentDto {
   @IsString()
   @IsOptional()
   fileUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  signedFileUrl?: string;
 }

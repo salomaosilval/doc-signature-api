@@ -1,7 +1,13 @@
 export class ZapSignWebhookDto {
-  doc_key: string;
-  event_type: 'SIGN' | 'FINISH';
-  signer_key?: string;
+  token: string;
   status: 'signed' | 'closed';
-  signature_date?: string;
+  event_type: 'doc_signed';
+  signers: Array<{
+    token: string;
+    status: string;
+    name: string;
+    email: string;
+    signed_at: string;
+  }>;
+  signed_file: string;
 }

@@ -99,4 +99,13 @@ export class DocumentsService {
     await this.findOne(id);
     await this.prisma.document.delete({ where: { id } });
   }
+
+  async findByZapSignId(zapSignId: string) {
+    return this.prisma.document.findFirst({
+      where: { zapsignId: zapSignId },
+      include: {
+        signers: true,
+      },
+    });
+  }
 }
