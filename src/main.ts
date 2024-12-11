@@ -16,6 +16,13 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Document Signature API')
     .setDescription(
